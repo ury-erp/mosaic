@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include ury_mosaic *.css
+recursive-include ury_mosaic *.csv
+recursive-include ury_mosaic *.html
+recursive-include ury_mosaic *.ico
+recursive-include ury_mosaic *.js
+recursive-include ury_mosaic *.json
+recursive-include ury_mosaic *.md
+recursive-include ury_mosaic *.png
+recursive-include ury_mosaic *.py
+recursive-include ury_mosaic *.svg
+recursive-include ury_mosaic *.txt
+recursive-exclude ury_mosaic *.pyc

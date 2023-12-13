@@ -1,0 +1,14 @@
+{
+  "name": "ury_mosaic",
+  "version": "1.0.0",
+  "description": "KOT(Kitchen Order Ticket) Management Software",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cd URYMosaic && yarn dev",
+    "build": "cd URYMosaic && yarn build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
