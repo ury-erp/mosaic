@@ -10,65 +10,67 @@ from frappe.model.document import Document
 
 class URYKOT(Document):
     def on_submit(self):
-        Pos_profile = frappe.get_doc("POS Profile", self.pos_profile)
-        # if Pos_profile.is_network_printing:
         self.multi_print_kot()
         self.kotDisplayRealtime()
+
     def before_submit(self):
         self.userSetting()
 
     # Function for printing multiple KOTs.
     def multi_print_kot(self):
-        Pos_profile = frappe.get_doc("POS Profile", self.pos_profile)
-
         # Function for printing a KOT on a specified printer using a print format.
         def print_kot(printer, kot_print_format):
             try:
-                print_by_server("URY KOT", self.name, printer.name, kot_print_format)
+                # Print KOT using a server function (print_by_server)
+                print_by_server("URY KOT", self.name, printer, kot_print_format)
             except:
                 pass
 
+        pos_kot_printer , pos_kot_print_format = frappe.db.get_value(
+            "URY Printer Settings",
+            {"parent": self.pos_profile, "custom_kot_print": 1},
+            ["printer","custom_kot_print_format"]
+        )
+
+        pos_print_flag = True
         if self.production:
-            production = frappe.get_doc("URY Production Unit", self.production)
-            for printer in production.printer_settings:
-                if printer.custom_kot_print == 1:
-                    Printer = frappe.get_doc(
-                        "Network Printer Settings", printer.printer
-                    )
-                    print_kot(Printer, printer.custom_kot_print_format)
+            production_unit_printer , production_kot_print_format = frappe.db.get_value(
+                "URY Printer Settings",
+                {"parent":  self.production, "custom_kot_print": 1},
+                ["printer","custom_kot_print_format"]
+            )
+            # If production unit printer is specified, print KOT in production printer
+            if production_unit_printer:
+                pos_print_flag = False
+                print_kot(production_unit_printer, production_kot_print_format)
 
-        if self.restaurant_table:
-            restaurant_table = frappe.get_doc("URY Table", self.restaurant_table)
-            room = frappe.get_doc("URY Room", restaurant_table.restaurant_room)
-            pos_print_flag = True
 
-            try:
-                if room.printer_settings:
-                    for room_printer in room.printer_settings:
-                        if room_printer.custom_kot_print == 1:
-                            pos_print_flag = False
-                            Printer = frappe.get_doc(
-                                "Network Printer Settings", room_printer.printer
-                            )
-                            print_kot(Printer, room_printer.custom_kot_print_format)
-            except:
-                pass
+        # Check if restaurant table is specified and it's not a takeaway order
+        if self.restaurant_table and self.table_takeaway == 0:
+            room = frappe.db.get_value(
+                "URY Table", self.restaurant_table, "restaurant_room"
+            )
+
+            room_kot_printer , room_kot_print_format = frappe.db.get_value(
+                "URY Printer Settings",
+                {"parent":  room, "custom_kot_print": 1},
+                ["printer","custom_kot_print_format"]
+            )
+            # If room printer is specified, print KOT in room
+            if room_kot_printer:
+                pos_print_flag = False
+                print_kot(room_kot_printer, room_kot_print_format)
+
 
             if pos_print_flag == True:
-                for printer in Pos_profile.printer_settings:
-                    if printer.custom_kot_print == 1:
-                        Printer = frappe.get_doc(
-                            "Network Printer Settings", printer.printer
-                        )
-                        print_kot(Printer, printer.custom_kot_print_format)
+                if pos_kot_printer:
+                    print_kot(pos_kot_printer, pos_kot_print_format)
+
 
         else:
-            for printer in Pos_profile.printer_settings:
-                if printer.custom_kot_print == 1:
-                    Printer = frappe.get_doc(
-                        "Network Printer Settings", printer.printer
-                    )
-                    print_kot(Printer, printer.custom_kot_print_format)
+            if pos_kot_printer:
+                print_kot(pos_kot_printer, pos_kot_print_format)
+
 
     # Function for displaying KOT-related information in real-time On KDS(Kitchen Display System)
     def kotDisplayRealtime(self):

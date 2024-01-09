@@ -60,4 +60,4 @@
 - Generate physical copies of KOTs
 - KOT Prints are generated when order are placed
 - Configure printers through network printing in POS profiles for global printing 
-- To print KOT in production unit you need to configure printer in production unit separately
+- To print KOT in the production unit and room, you need to configure the printer separately for each location.
