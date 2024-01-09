@@ -26,24 +26,37 @@ class URYKOT(Document):
             except:
                 pass
 
-        pos_kot_printer , pos_kot_print_format = frappe.db.get_value(
+        
+        
+        pos_kot_printer = frappe.db.get_value(
             "URY Printer Settings",
             {"parent": self.pos_profile, "custom_kot_print": 1},
-            ["printer","custom_kot_print_format"]
+            "printer"
+        )
+        pos_kot_print_format = frappe.db.get_value(
+            "URY Printer Settings",
+            {"parent": self.pos_profile, "custom_kot_print": 1},
+             "custom_kot_print_format"
         )
 
+    
         pos_print_flag = True
         if self.production:
-            production_unit_printer , production_kot_print_format = frappe.db.get_value(
+            production_unit_printer = frappe.db.get_value(
                 "URY Printer Settings",
-                {"parent":  self.production, "custom_kot_print": 1},
-                ["printer","custom_kot_print_format"]
+                {"parent": self.production, "custom_kot_print": 1},
+                "printer"
             )
+            production_kot_print_format = frappe.db.get_value(
+                "URY Printer Settings",
+                {"parent": self.production, "custom_kot_print": 1},
+               "custom_kot_print_format"
+            )
+
             # If production unit printer is specified, print KOT in production printer
             if production_unit_printer:
                 pos_print_flag = False
                 print_kot(production_unit_printer, production_kot_print_format)
-
 
         # Check if restaurant table is specified and it's not a takeaway order
         if self.restaurant_table and self.table_takeaway == 0:
@@ -51,26 +64,30 @@ class URYKOT(Document):
                 "URY Table", self.restaurant_table, "restaurant_room"
             )
 
-            room_kot_printer , room_kot_print_format = frappe.db.get_value(
+
+            room_kot_printer = frappe.db.get_value(
                 "URY Printer Settings",
-                {"parent":  room, "custom_kot_print": 1},
-                ["printer","custom_kot_print_format"]
+                {"parent": room, "custom_kot_print": 1},
+                "printer"
             )
+            room_kot_print_format = frappe.db.get_value(
+                "URY Printer Settings",
+                {"parent": room, "custom_kot_print": 1},
+                "custom_kot_print_format"
+            )
+            
             # If room printer is specified, print KOT in room
             if room_kot_printer:
                 pos_print_flag = False
                 print_kot(room_kot_printer, room_kot_print_format)
 
-
             if pos_print_flag == True:
                 if pos_kot_printer:
                     print_kot(pos_kot_printer, pos_kot_print_format)
 
-
         else:
             if pos_kot_printer:
                 print_kot(pos_kot_printer, pos_kot_print_format)
-
 
     # Function for displaying KOT-related information in real-time On KDS(Kitchen Display System)
     def kotDisplayRealtime(self):
