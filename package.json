@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cd URYMosaic && yarn dev",
-    "build": "cd URYMosaic && yarn build"
+    "build": "cd URYMosaic && npm install && yarn build"
   },
   "keywords": [],
   "author": "",
