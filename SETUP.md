@@ -27,3 +27,5 @@ Follow these steps to set up URY Mosaic after completing basic ERPNext configura
   - **Printers** : Table to configure printing inside production unit.
         - **Printer** : Select Network printer.
         - **KOT Print** : Enable for KOT Printing .
+        - **KOT Print Format** : Select print format for KOT .
+        - **Block Takeaway KOT** : Enable for block Takeaway KOT printing .

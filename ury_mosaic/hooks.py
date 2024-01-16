@@ -79,7 +79,8 @@ fixtures = [
 						"POS Profile-custom_kot_warning_time",
 						"POS Profile-custom_cl",
 						"POS Profile-custom_notify_kot_delay",
-						"POS Profile-custom_recipients"
+						"POS Profile-custom_recipients",
+                        "URY Printer Settings-custom_block_takeaway_kot"
 					}
 			]
 		]

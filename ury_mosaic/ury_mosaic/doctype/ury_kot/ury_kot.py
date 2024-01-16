@@ -38,7 +38,7 @@ class URYKOT(Document):
         if self.production:
             production_unit_printers = frappe.get_all(
                 "URY Printer Settings",
-                fields=["printer", "custom_kot_print_format","custom_kot_print"], 
+                fields=["printer", "custom_kot_print_format","custom_kot_print","custom_block_takeaway_kot"], 
                 filters={"parent": self.production, "custom_kot_print": 1,"parenttype":"URY Production Unit"},
                 order_by="idx"
             )
@@ -47,7 +47,11 @@ class URYKOT(Document):
             if production_unit_printers:
                 for printer in production_unit_printers:
                     pos_print_flag = False
-                    print_kot(printer.printer, printer.custom_kot_print_format)
+                    if printer.custom_block_takeaway_kot == 1 :
+                        if self.restaurant_table and self.table_takeaway == 0:
+                            print_kot(printer.printer, printer.custom_kot_print_format)
+                    else:
+                        print_kot(printer.printer, printer.custom_kot_print_format)
 
                 # Check if restaurant table is specified and it's not a takeaway order
                 if self.restaurant_table and self.table_takeaway == 0:
