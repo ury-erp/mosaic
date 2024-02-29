@@ -2,6 +2,7 @@
 
 **Prerequisite Setup:**
 - Before using URY Mosaic, ensure you have URY installed.
+- Doppio is used to setup and manage  custom desk pages using Vue 3 on URY Mosaic App and you don't have to install doppio in your site.
 - Follow the [URY installation guide](https://github.com/ury-erp/ury/blob/main/INSTALLATION.md) for the installation process.
 
 ### To install URY Mosaic, follow these steps:
@@ -11,6 +12,13 @@
 ```sh
   $ bench new-site sitename
 ```
+
+**Install the Doppio app to your bench:**
+
+```sh 
+  $ bench get-app https://github.com/NagariaHussain/doppio
+```
+
 **Install the URY Mosaic app to your bench:**
 
 ```sh
