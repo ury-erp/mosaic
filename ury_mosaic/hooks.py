@@ -86,7 +86,12 @@ fixtures = [
 						"POS Profile-custom_reset_order_number_daily",
 						"POS Invoice-custom_ury_order_number",
                         "URY Menu Course-custom_serving_priority",
-                        "URY Menu Course-custom_indicate_in_kds"
+                        "URY Menu Course-custom_indicate_in_kds",
+						"POS Profile-custom_enable_kot_reprint",
+						"POS Profile-custom_parcel_order_printer",
+						"POS Profile-custom_column_break_wwq3q",
+						"POS Profile-custom_table_order_printer",
+						"POS Profile-custom_reprint_kot_format"
 					}
 			]
 		]
