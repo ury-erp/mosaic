@@ -8,8 +8,8 @@ from frappe.utils.print_format import print_by_server
 def reprint_kot(invoice_number):
 
     try:
-        pos_profile, restaurant_table = frappe.db.get_value(
-            "POS Invoice", invoice_number, ["pos_profile", "restaurant_table"]
+        pos_profile, restaurant_table, order_type = frappe.db.get_value(
+            "POS Invoice", invoice_number, ["pos_profile", "restaurant_table","order_type"]
         )
         if not pos_profile:
             frappe.throw(f"POS Profile not found for Invoice {invoice_number}.")
@@ -26,7 +26,7 @@ def reprint_kot(invoice_number):
         if not kot_print_format:
             frappe.throw("No KOT Reprint Print Format is set in POS Profile.")
         
-        printer = table_order_printer if restaurant_table else parcel_order_printer
+        printer = table_order_printer if order_type == "Dine In" else parcel_order_printer
 
         if not printer:
             frappe.throw("No printer is assigned for reprinting KOT.")
