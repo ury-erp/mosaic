@@ -38,9 +38,7 @@
         </div>
         <!-- Alert Modal div end-->
 
-        <div
-            class="mt-5 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-        >
+        <div class="mt-5 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <div v-for="kot in this.kot" :key="kot.name">
                 <div
                     :class="[kot.color]"
@@ -90,17 +88,17 @@
                             >
                                 <div class="text-sm w-60">
                                     <span
-                                        v-if="!is_role_responsible_for_serving_kot"
+                                        v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager"
                                         class="text-sm font-medium text-[#6B7280]"
                                     >{{ $t('kitchenUnit') }}:
                                     </span>
                                     <span
-                                        v-if="!is_role_responsible_for_serving_kot"
+                                        v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager"
                                         class="text-black-500 mr-2 font-semibold"
                                     >
                                         {{ kot.production }}
                                     </span>
-                                    <br v-if="!is_role_responsible_for_serving_kot">
+                                    <br v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager">
                                     <!-- v-if="kot.tableortakeaway !== 'Takeaway'" -->
                                     <span
                                         v-if="!kot.table_takeaway"
@@ -166,6 +164,7 @@
                             <div></div>
                             <div class="mt-5">
                                 <div
+                                    :class="[GetKOTItemColor(kotitem.kot_type, kot.restaurant_table, kot.table_takeaway), 'rounded p-2']"
                                     class="font-semibold justify-between items-center mt-2"
                                     v-for="kotitem in sortedKotItems(kot)"
                                     :key="kotitem.name"
@@ -196,7 +195,7 @@
                                         <span
                                             class="mr-2 text-gray-700 text-sm"
                                             v-if="
-                                                is_role_responsible_for_serving_kot &&
+                                                (is_role_responsible_for_serving_kot || is_restaurant_manager) &&
                                                     (kotitem?.kot_type === 'Partially cancelled' ||
                                                     kotitem?.kot_type === 'Cancelled')"
                                         >
@@ -212,22 +211,22 @@
                                         <span
                                             class="mr-2 text-gray-700 text-sm"
                                             v-else-if="
-                                                !is_role_responsible_for_serving_kot &&
-                                                    (kot.type === 'Partially cancelled' ||
-                                                    kot.type === 'Cancelled')"
+                                                (!is_role_responsible_for_serving_kot && !is_restaurant_manager) &&
+                                                    (kot?.type === 'Partially cancelled' ||
+                                                    kot?.type === 'Cancelled')"
                                         >
                                             [الكمية السابقة = {{ kotitem.quantity }}]
                                         </span>
                                         <span
                                             class="mr-2 text-gray-500 flex items-center"
-                                            v-if="is_role_responsible_for_serving_kot &&
+                                            v-if="(is_role_responsible_for_serving_kot || is_restaurant_manager) &&
                                                 (kotitem?.kot_type !== 'Partially cancelled' &&
                                                 kotitem?.kot_type !== 'Cancelled')"
                                             style="font-size: 0.70rem; line-height: 0.75rem;"
                                         >
                                             ({{ kotitem.kot_production + " | " + $t(kotitem.kot_type) }})
                                             <div
-                                                v-if="is_role_responsible_for_serving_kot"
+                                                v-if="is_role_responsible_for_serving_kot || is_restaurant_manager"
                                                 :class="[
                                                     (kotitem?.timeRemaining >= (kotitem?.preparation_time - 1) &&
                                                     kotitem?.kot_type !== 'Cancelled' &&
@@ -261,34 +260,34 @@
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 
-    <!-- Audio Alert Message -->
-    <div
-        v-if="showAudioAlertMessage"
-        class="absolute top-1 left-1/2 transform -translate-x-1/2 p-2 font-bold text-2xl text-red-500 text-center"
-    >
-        {{ $t('alertSound') }}
-    </div>
+        <!-- Audio Alert Message -->
+        <div
+            v-if="showAudioAlertMessage"
+            class="absolute top-1 left-1/2 transform -translate-x-1/2 p-2 font-bold text-2xl text-red-500 text-center"
+        >
+            {{ $t('alertSound') }}
+        </div>
 
-    <div
-        v-if="statusMessage"
-        :class="[
-            'fixed',
-            'bottom-10',
-            'left-10',
-            'p-4',
-            'rounded',
-            'text-white',
-            {
-                'bg-green-500': isOnline,
-                'bg-red-500': !isOnline,
-            },
-        ]"
-        @transitionend="handleTransitionEnd"
-    >
-        {{ statusMessage }}
-    </div>
+        <div
+            v-if="statusMessage"
+            :class="[
+                'fixed',
+                'bottom-10',
+                'left-10',
+                'p-4',
+                'rounded',
+                'text-white',
+                {
+                    'bg-green-500': isOnline,
+                    'bg-red-500': !isOnline,
+                },
+            ]"
+            @transitionend="handleTransitionEnd"
+        >
+            {{ statusMessage }}
+        </div>
     </div>
 </template>
 
@@ -369,6 +368,7 @@
                 userRole: [],
                 production_units_roles_map: null,
                 is_role_responsible_for_serving_kot: false,
+                is_restaurant_manager: false,
             };
         },
         setup() {
@@ -427,6 +427,7 @@
                                 this.kot_channel_fetch = `kot_update_${this.custom_branch_in_english}_fetch`;
 
                                 this.is_role_responsible_for_serving_kot = result.message.is_role_responsible_for_serving_kot;
+                                this.is_restaurant_manager = result.message.is_restaurant_manager;
                                 
                                 this.kot = result.message.KOT;
                                 this.updateQtyColorTable();
@@ -528,6 +529,21 @@
                 //     JSON.stringify(kotitem.striked)
                 // );
             },
+            GetKOTItemColor(type, restaurant_table, table_takeaway) {
+                if (this.is_role_responsible_for_serving_kot || this.is_restaurant_manager) {
+                    if (type == "Order Modified") {
+                        return "bg-[#FFD493] border border-[#FFC700]";
+                    } else if (type == "Partially cancelled" || type == "Cancelled") {
+                        return "bg-[#FFD2D2] border border-[#FAA7A7]";
+                    } else if (restaurant_table === undefined || table_takeaway == 1) {
+                        return "bg-blue-100 border border-blue-200";
+                    } else {
+                        return "bg-white";
+                    }
+                } else {
+                    return ''
+                }
+            },
             updateColorandTable(kot, restaurant_table, type, table_takeaway) {
                 if (restaurant_table === undefined) {
                     kot.tableortakeaway = "Takeaway";
@@ -566,7 +582,7 @@
                         //     kotitem.striked = JSON.parse(savedState);
                         // }
 
-                        if(this.is_role_responsible_for_serving_kot) {
+                        if(this.is_role_responsible_for_serving_kot || this.is_restaurant_manager) {
                             this.calculateQty(
                                 kotitem,
                                 kotitem.quantity,
@@ -604,7 +620,7 @@
             updateTimeRemaining() {
                 // console.log("update time", this.kot_channel);
                 this.kot.forEach((kot) => {
-                    if (this.is_role_responsible_for_serving_kot) {
+                    if (this.is_role_responsible_for_serving_kot || this.is_restaurant_manager) {
                         kot.kot_items.forEach((kot_item) => {
                             kot_item.timeRemaining = this.calculateTimeElapsed(kot_item?.kot_time, kot_item?.preparation_time);
                         });
@@ -802,7 +818,7 @@
                             this.showAudioAlertMessage = true;
                         }
                         socket.on(this.kot_channel, (doc) => {
-                            if (this.is_role_responsible_for_serving_kot) {
+                            if (this.is_role_responsible_for_serving_kot || this.is_restaurant_manager) {
                                 if (this.audio_alert === 1) {
                                     this.playAlertSound(doc.audio_file);
                                 }

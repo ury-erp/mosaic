@@ -165,72 +165,110 @@ def kot_list():
         kotjson = json.loads(frappe.as_json(kotdoc))
         KOT.append(kotjson)
     
+    # ############################### Group by Invoice and Table #############################################################
+    # # if is_role_responsible_for_serving_kot:
+    # if is_role_responsible_for_serving_kot or is_restaurant_manager:
+    #     KOT_Invoice_Grouped = {}
+    #     KOT_Table_Grouped = {}
+    #     for KOT_Doc in KOT:
+    #         if KOT_Doc['table_takeaway']:
+    #             invoice = KOT_Doc['invoice']
+    #             if invoice not in KOT_Invoice_Grouped:
+    #                 KOT_Invoice_Grouped[invoice] = KOT_Doc
+    #                 KOT_Invoice_Grouped[invoice]['kot_names'] = []
+                    
+    #                 kot_items = []
+    #                 for kot_item in KOT_Doc['kot_items']:
+    #                     new_kot_item = kot_item
+    #                     new_kot_item['kot_production'] = KOT_Doc['production']
+    #                     new_kot_item['kot_time'] = KOT_Doc['time']
+    #                     new_kot_item['kot_type'] = KOT_Doc['type']
+
+    #                     kot_items.append(new_kot_item)
+                        
+    #                 KOT_Invoice_Grouped[invoice]['kot_items'] = kot_items
+
+    #             elif KOT_Invoice_Grouped[invoice]:
+    #                 for kot_item in KOT_Doc['kot_items']:
+    #                     new_kot_item = kot_item
+    #                     new_kot_item['kot_production'] = KOT_Doc['production']
+    #                     new_kot_item['kot_time'] = KOT_Doc['time']
+    #                     new_kot_item['kot_type'] = KOT_Doc['type']
+
+    #                     KOT_Invoice_Grouped[invoice]['kot_items'].append(new_kot_item)
+
+    #             KOT_Invoice_Grouped[invoice]['kot_names'].append(KOT_Doc['name']) if (KOT_Doc['name'] not in KOT_Invoice_Grouped[invoice]['kot_names']) else None
+    #         else:
+    #             restaurant_table = KOT_Doc['restaurant_table']
+    #             if restaurant_table not in KOT_Table_Grouped:
+    #                 KOT_Table_Grouped[restaurant_table] = KOT_Doc
+    #                 KOT_Table_Grouped[restaurant_table]['kot_names'] = []
+                    
+    #                 kot_items = []
+    #                 for kot_item in KOT_Doc['kot_items']:
+    #                     new_kot_item = kot_item
+    #                     new_kot_item['kot_production'] = KOT_Doc['production']
+    #                     new_kot_item['kot_time'] = KOT_Doc['time']
+    #                     new_kot_item['kot_type'] = KOT_Doc['type']
+
+    #                     kot_items.append(new_kot_item)
+                        
+    #                 KOT_Table_Grouped[restaurant_table]['kot_items'] = kot_items
+
+    #             elif KOT_Table_Grouped[restaurant_table]:
+    #                 for kot_item in KOT_Doc['kot_items']:
+    #                     new_kot_item = kot_item
+    #                     new_kot_item['kot_production'] = KOT_Doc['production']
+    #                     new_kot_item['kot_time'] = KOT_Doc['time']
+    #                     new_kot_item['kot_type'] = KOT_Doc['type']
+
+    #                     KOT_Table_Grouped[restaurant_table]['kot_items'].append(new_kot_item)
+
+    #             KOT_Table_Grouped[restaurant_table]['kot_names'].append(KOT_Doc['name']) if (KOT_Doc['name'] not in KOT_Table_Grouped[restaurant_table]['kot_names']) else None
+        
+    #     invoice_grouped_list = list(KOT_Invoice_Grouped.values())
+    #     table_grouped_list = list(KOT_Table_Grouped.values())
+
+    #     merged_kot_list = table_grouped_list + invoice_grouped_list
+
+    #     KOT = merged_kot_list
+    # ############################### Group by Invoice and Table #############################################################
+
+
+    # ############################### Group by Invoice #############################################################
     # if is_role_responsible_for_serving_kot:
     if is_role_responsible_for_serving_kot or is_restaurant_manager:
         KOT_Invoice_Grouped = {}
-        KOT_Table_Grouped = {}
         for KOT_Doc in KOT:
-            if KOT_Doc['table_takeaway']:
-                invoice = KOT_Doc['invoice']
-                if invoice not in KOT_Invoice_Grouped:
-                    KOT_Invoice_Grouped[invoice] = KOT_Doc
-                    KOT_Invoice_Grouped[invoice]['kot_names'] = []
+            invoice = KOT_Doc['invoice']
+            if invoice not in KOT_Invoice_Grouped:
+                KOT_Invoice_Grouped[invoice] = KOT_Doc
+                KOT_Invoice_Grouped[invoice]['kot_names'] = []
+                
+                kot_items = []
+                for kot_item in KOT_Doc['kot_items']:
+                    new_kot_item = kot_item
+                    new_kot_item['kot_production'] = KOT_Doc['production']
+                    new_kot_item['kot_time'] = KOT_Doc['time']
+                    new_kot_item['kot_type'] = KOT_Doc['type']
+
+                    kot_items.append(new_kot_item)
                     
-                    kot_items = []
-                    for kot_item in KOT_Doc['kot_items']:
-                        new_kot_item = kot_item
-                        new_kot_item['kot_production'] = KOT_Doc['production']
-                        new_kot_item['kot_time'] = KOT_Doc['time']
-                        new_kot_item['kot_type'] = KOT_Doc['type']
+                KOT_Invoice_Grouped[invoice]['kot_items'] = kot_items
 
-                        kot_items.append(new_kot_item)
-                        
-                    KOT_Invoice_Grouped[invoice]['kot_items'] = kot_items
+            elif KOT_Invoice_Grouped[invoice]:
+                for kot_item in KOT_Doc['kot_items']:
+                    new_kot_item = kot_item
+                    new_kot_item['kot_production'] = KOT_Doc['production']
+                    new_kot_item['kot_time'] = KOT_Doc['time']
+                    new_kot_item['kot_type'] = KOT_Doc['type']
 
-                elif KOT_Invoice_Grouped[invoice]:
-                    for kot_item in KOT_Doc['kot_items']:
-                        new_kot_item = kot_item
-                        new_kot_item['kot_production'] = KOT_Doc['production']
-                        new_kot_item['kot_time'] = KOT_Doc['time']
-                        new_kot_item['kot_type'] = KOT_Doc['type']
+                    KOT_Invoice_Grouped[invoice]['kot_items'].append(new_kot_item)
 
-                        KOT_Invoice_Grouped[invoice]['kot_items'].append(new_kot_item)
-
-                KOT_Invoice_Grouped[invoice]['kot_names'].append(KOT_Doc['name']) if (KOT_Doc['name'] not in KOT_Invoice_Grouped[invoice]['kot_names']) else None
-            else:
-                restaurant_table = KOT_Doc['restaurant_table']
-                if restaurant_table not in KOT_Table_Grouped:
-                    KOT_Table_Grouped[restaurant_table] = KOT_Doc
-                    KOT_Table_Grouped[restaurant_table]['kot_names'] = []
-                    
-                    kot_items = []
-                    for kot_item in KOT_Doc['kot_items']:
-                        new_kot_item = kot_item
-                        new_kot_item['kot_production'] = KOT_Doc['production']
-                        new_kot_item['kot_time'] = KOT_Doc['time']
-                        new_kot_item['kot_type'] = KOT_Doc['type']
-
-                        kot_items.append(new_kot_item)
-                        
-                    KOT_Table_Grouped[restaurant_table]['kot_items'] = kot_items
-
-                elif KOT_Table_Grouped[restaurant_table]:
-                    for kot_item in KOT_Doc['kot_items']:
-                        new_kot_item = kot_item
-                        new_kot_item['kot_production'] = KOT_Doc['production']
-                        new_kot_item['kot_time'] = KOT_Doc['time']
-                        new_kot_item['kot_type'] = KOT_Doc['type']
-
-                        KOT_Table_Grouped[restaurant_table]['kot_items'].append(new_kot_item)
-
-                KOT_Table_Grouped[restaurant_table]['kot_names'].append(KOT_Doc['name']) if (KOT_Doc['name'] not in KOT_Table_Grouped[restaurant_table]['kot_names']) else None
+            KOT_Invoice_Grouped[invoice]['kot_names'].append(KOT_Doc['name']) if (KOT_Doc['name'] not in KOT_Invoice_Grouped[invoice]['kot_names']) else None
         
-        invoice_grouped_list = list(KOT_Invoice_Grouped.values())
-        table_grouped_list = list(KOT_Table_Grouped.values())
-
-        merged_kot_list = table_grouped_list + invoice_grouped_list
-
-        KOT = merged_kot_list
+        KOT = list(KOT_Invoice_Grouped.values())
+    # ############################### Group by Invoice #############################################################
 
 
     return {
@@ -242,4 +280,5 @@ def kot_list():
         "daily_order_number":daily_order_number,
         "production_units_roles_map": production_units_roles_map,
         "is_role_responsible_for_serving_kot": is_role_responsible_for_serving_kot,
+        "is_restaurant_manager": is_restaurant_manager,
     }
