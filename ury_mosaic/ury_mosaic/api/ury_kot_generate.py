@@ -61,13 +61,30 @@ def create_kot_doc(
         }
     )
     branch = getBranch()
-    if restaurant_table:
-        room = frappe.db.get_value("URY Table", restaurant_table, "restaurant_room")
-        restaurant = frappe.db.get_value("URY Table", restaurant_table, "restaurant")
-        menu = frappe.db.get_value("Menu for Room", {"room": room,"parent":restaurant}, "menu")
-        
+    if is_aggregator:
+        priceList = frappe.db.get_value(
+            "Aggregator Settings",
+            {"customer": customer, "parent": branch, "parenttype": "Branch"},
+            "price_list",
+        )
+
+        if not priceList:
+            frappe.throw(f"There is no Default Price List for aggregator {customer}, please select a default price list for aggregator.")
+
+        menu = frappe.db.get_value(
+            "Price List", {"name": priceList}, "restaurant_menu"
+        )
+
+        if not menu:
+            frappe.throw(f"There is no Restaurant Menu for aggregator {customer} and price list {priceList}")
     else:
-        menu = frappe.db.get_value("URY Restaurant", {"branch": branch}, "active_menu")
+        if restaurant_table:
+            room = frappe.db.get_value("URY Table", restaurant_table, "restaurant_room")
+            restaurant = frappe.db.get_value("URY Table", restaurant_table, "restaurant")
+            menu = frappe.db.get_value("Menu for Room", {"room": room,"parent":restaurant}, "menu")
+            
+        else:
+            menu = frappe.db.get_value("URY Restaurant", {"branch": branch}, "active_menu")
 
     for item in items:
         course = frappe.db.get_value("URY Menu Item", {"item": item["item_code"],"parent":menu}, "course")
@@ -124,7 +141,26 @@ def process_items_for_kot(
 ):
     kot_items = create_order_items(items)
     pos_profile = frappe.get_doc("POS Profile", pos_profile_id)
-    restaurant_active_menu = frappe.db.get_value("URY Restaurant", pos_profile.restaurant, "active_menu")
+
+    invoice_order_type = frappe.db.get_value("POS Invoice", invoice_id, "order_type")
+    if invoice_order_type == "Aggregators":
+        priceList = frappe.db.get_value(
+            "Aggregator Settings",
+            {"customer": customer, "parent": pos_profile.branch, "parenttype": "Branch"},
+            "price_list",
+        )
+
+        if not priceList:
+            frappe.throw(f"There is no Default Price List for aggregator {customer}, please select a default price list for aggregator.")
+
+        restaurant_active_menu = frappe.db.get_value(
+            "Price List", {"name": priceList}, "restaurant_menu"
+        )
+
+        if not restaurant_active_menu:
+            frappe.throw(f"There is no Restaurant Menu for aggregator {customer} and price list {priceList}")
+    else:
+        restaurant_active_menu = frappe.db.get_value("URY Restaurant", pos_profile.restaurant, "active_menu")
     productions = frappe.db.get_all(
         "URY Production Unit", filters={"branch": pos_profile.branch}, fields=["name"]
     )
@@ -216,7 +252,26 @@ def process_items_for_cancel_kot(
 
     kot_items = create_order_items(items)
     pos_profile = frappe.get_doc("POS Profile", pos_profile_id)
-    restaurant_active_menu = frappe.db.get_value("URY Restaurant", pos_profile.restaurant, "active_menu")
+
+    invoice_order_type = frappe.db.get_value("POS Invoice", invoice_id, "order_type")
+    if invoice_order_type == "Aggregators":
+        priceList = frappe.db.get_value(
+            "Aggregator Settings",
+            {"customer": customer, "parent": pos_profile.branch, "parenttype": "Branch"},
+            "price_list",
+        )
+
+        if not priceList:
+            frappe.throw(f"There is no Default Price List for aggregator {customer}, please select a default price list for aggregator.")
+
+        restaurant_active_menu = frappe.db.get_value(
+            "Price List", {"name": priceList}, "restaurant_menu"
+        )
+
+        if not restaurant_active_menu:
+            frappe.throw(f"There is no Restaurant Menu for aggregator {customer} and price list {priceList}")
+    else:
+        restaurant_active_menu = frappe.db.get_value("URY Restaurant", pos_profile.restaurant, "active_menu")
     productions = frappe.db.get_all(
         "URY Production Unit", filters={"branch": pos_profile.branch}, fields=["name"]
     )
@@ -312,13 +367,32 @@ def create_cancel_kot_doc(
     )
 
     branch = getBranch()
-    if restaurant_table:
-        room = frappe.db.get_value("URY Table", restaurant_table, "restaurant_room")
-        restaurant = frappe.db.get_value("URY Table", restaurant_table, "restaurant")
-        menu = frappe.db.get_value("Menu for Room", {"room": room,"parent":restaurant}, "menu")
-        
+
+    if is_aggregator:
+        priceList = frappe.db.get_value(
+            "Aggregator Settings",
+            {"customer": customer, "parent": branch, "parenttype": "Branch"},
+            "price_list",
+        )
+
+        if not priceList:
+            frappe.throw(f"There is no Default Price List for aggregator {customer}, please select a default price list for aggregator.")
+
+        menu = frappe.db.get_value(
+            "Price List", {"name": priceList}, "restaurant_menu"
+        )
+
+        if not menu:
+            frappe.throw(f"There is no Restaurant Menu for aggregator {customer} and price list {priceList}")
     else:
-        menu = frappe.db.get_value("URY Restaurant", {"branch": branch}, "active_menu")
+        if restaurant_table:
+            room = frappe.db.get_value("URY Table", restaurant_table, "restaurant_room")
+            restaurant = frappe.db.get_value("URY Table", restaurant_table, "restaurant")
+            menu = frappe.db.get_value("Menu for Room", {"room": room,"parent":restaurant}, "menu")
+            
+        else:
+            menu = frappe.db.get_value("URY Restaurant", {"branch": branch}, "active_menu")
+    
     for cancelItem in cancel_items:
         course = frappe.db.get_value("URY Menu Item", {"item": cancelItem["item_code"],"parent":menu}, "course")
         for item in invoiceItems:
