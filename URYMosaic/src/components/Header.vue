@@ -1,5 +1,6 @@
 <template>
-  <header class="bg-white p-2 flex justify-between items-center">
+  <!-- <header class="bg-white p-2 flex justify-between items-center"> -->
+  <header class="bg-white px-4 py-1.5 flex justify-between items-center h-16">
     <a :href="'#'" class="flex items-center justify-between" v-if="system_settings.restaurant_system_settings.show_erpnext_mosaic_logo">
         <img v-if="system_settings.restaurant_system_settings.show_erpnext_mosaic_logo" :src="ERPNextMosaicLogoPath" alt="" class="h-12 w-auto"/>
     </a>

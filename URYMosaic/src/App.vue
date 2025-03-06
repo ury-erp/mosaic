@@ -1,6 +1,7 @@
 <template>
 	<Header/>
- 	<div class="bg-slate-300 min-h-screen"><KOT /></div>
+ 	<!-- <div class="bg-slate-300 min-h-screen"><KOT /></div> -->
+ 	<div class="bg-slate-300"><KOT /></div>
 </template>
 
 <script>

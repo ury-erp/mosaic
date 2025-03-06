@@ -1,5 +1,6 @@
 <template>
-    <div class="container mx-auto p-3 mb-16 relative">
+    <!-- <div class="container mx-auto p-3 mb-16 relative"> -->
+    <div class="w-full pl-3 mb-12 relative">
         <!-- Alert Modal div start-->
         <div
             v-if="this.showModal"
@@ -38,15 +39,32 @@
         </div>
         <!-- Alert Modal div end-->
 
-        <div class="mt-5 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <!-- loading skeleton -->
+        <!-- <div v-if="loading" class="flex flex-row-reverse flex-nowrap overflow-x-auto space-x-4 py-2 px-3 h-[calc(100vh-120px)]">
+            <div v-for="n in 4" class="flex flex-col flex-shrink-0 w-80 shadow-lg gap-4 p-3 rounded-2xl h-[calc(100vh-140px)] mx-2 kot-card bg-gray-100 animate-pulse"></div>
+        </div> -->
+
+        <!-- <div class="mt-5 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"> -->
+        <div class="flex flex-row-reverse flex-nowrap overflow-x-auto space-x-4 py-2 px-3 h-[calc(100vh-120px)]">
             <div v-for="kot in this.kot" :key="kot.name">
-                <div
+                <!-- <div
                     :class="[kot.color]"
                     class="inline-block shadow-lg gap-4 p-3 rounded-2xl w-90 h-auto masonry-item"
                     style="margin-top: 28px"
                     v-if="!kot.showDiv"
+                > -->
+                <div
+                    :class="[
+                        kot.color,
+                        'flex flex-col flex-shrink-0 w-80 shadow-lg gap-4 p-3 rounded-2xl h-[calc(100vh-140px)] mx-2 kot-card relative',
+                        {
+                            'pulsing-border': (kot.timeRemaining >= (kot.preparation_time - 1) && kot.type !== 'Cancelled' && kot.type !== 'Partially cancelled')
+                        },
+                    ]"
+                    v-if="!kot.showDiv"
                 >
-                    <div class="w-80 check">
+                    <!-- <div class="w-80 check"> -->
+                    <div class="w-full kot-content">
                         <div
                             :class="[{ hidden: !kot.isRotated }]"
                             @click="
@@ -79,93 +97,95 @@
                             <!-- Serve Button -->
 
                             <!-- Card Header: Table Name and Order Number -->
-                            <div
-                                class="flex justify-between hover:cursor-pointer"
-                                @click="
-                                    (((userRole.includes(production_units_roles_map[kot.production]['role_responsible_for_serving_kot'])) && (kot.type !== 'Cancelled' && kot.type !== 'Partially cancelled')) && rotateCard(kot)) ||
-                                    (((userRole.includes(production_units_roles_map[kot.production]['role_responsible_for_confirming_cancelled_kot'])) && (kot.type === 'Cancelled' || kot.type === 'Partially cancelled')) && rotateCard(kot))
-                                "
-                            >
-                                <div class="text-sm w-60">
-                                    <span
-                                        v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager"
-                                        class="text-sm font-medium text-[#6B7280]"
-                                    >{{ $t('kitchenUnit') }}:
-                                    </span>
-                                    <span
-                                        v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager"
-                                        class="text-black-500 mr-2 font-semibold"
+                            <div class="border-b border-2px border-gray-800 pb-2">
+                                <div
+                                    class="flex justify-between hover:cursor-pointer"
+                                    @click="
+                                        (((userRole.includes(production_units_roles_map[kot.production]['role_responsible_for_serving_kot'])) && (kot.type !== 'Cancelled' && kot.type !== 'Partially cancelled')) && rotateCard(kot)) ||
+                                        (((userRole.includes(production_units_roles_map[kot.production]['role_responsible_for_confirming_cancelled_kot'])) && (kot.type === 'Cancelled' || kot.type === 'Partially cancelled')) && rotateCard(kot))
+                                    "
+                                >
+                                    <div class="text-sm w-50">
+                                        <span
+                                            v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager"
+                                            class="text-sm font-medium text-[#6B7280]"
+                                        >{{ $t('kitchenUnit') }}:
+                                        </span>
+                                        <span
+                                            v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager"
+                                            class="text-black-500 mr-2 font-semibold"
+                                        >
+                                            {{ kot.production }}
+                                        </span>
+                                        <br v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager">
+                                        <!-- v-if="kot.tableortakeaway !== 'Takeaway'" -->
+                                        <span
+                                            v-if="!kot.table_takeaway"
+                                            class="text-sm font-medium text-[#6B7280]"
+                                        >{{ $t('table') }}:
+                                        </span>
+                                        <span class="text-black-500 font-semibold">
+                                            {{ kot.tableortakeaway }}
+                                            <span class="text-sm font-medium text-[#6B7280]">
+                                                ( {{ kot.user }} )
+                                            </span
+                                        ></span>
+                                        <br />
+                                        <span v-if="kot.is_aggregator" class="text-sm font-medium text-[#6B7280]">التطبيقات الوسيطة</span>
+                                        <span v-if="kot.is_aggregator" class="text-black-500 mr-2 font-semibold">
+                                            {{ kot.customer_name }}
+                                        </span>
+                                        <br v-if="kot.is_aggregator" />
+                                        <span v-if="kot.is_aggregator" class="text-sm font-medium text-[#6B7280]">مُعرف التطبيق الوسيط</span>
+                                        <span v-if="kot.is_aggregator" class="text-black-500 mr-2 font-semibold">
+                                            {{ kot.aggregator_id }}
+                                        </span>
+                                        <br v-if="kot.is_aggregator"/>
+                                        <span class="text-sm font-medium text-[#6B7280]">{{ $t('order') }}:</span>
+                                        <span class="text-black-500 mr-2 font-semibold text-xs">
+                                            <!-- {{ this.daily_order_number ? kot.order_no : kot.invoice.slice(-4) }} -->
+                                            {{ this.daily_order_number ? kot.order_no : kot.invoice }}
+                                        </span>
+                                        <!-- <span
+                                            class="text-black-500 mr-2 font-semibold"
+                                            v-if="
+                                                kot.type === 'Partially cancelled' ||
+                                                kot.type === 'Cancelled'
+                                            "
+                                        >
+                                            ( {{ kot.type }} )</span
+                                        > -->
+                                    </div>
+                                    <div
+                                        :class="[
+                                            (kot.timeRemaining >= (kot.preparation_time - 1) &&
+                                            kot.type !== 'Cancelled' &&
+                                            kot.type !== 'Partially cancelled') ?
+                                            'text-[#DC0000]' :
+                                            'text-black'
+                                        ]"
+                                        class="font-inter font-semibold text-2xl leading-10"
                                     >
-                                        {{ kot.production }}
-                                    </span>
-                                    <br v-if="!is_role_responsible_for_serving_kot && !is_restaurant_manager">
-                                    <!-- v-if="kot.tableortakeaway !== 'Takeaway'" -->
-                                    <span
-                                        v-if="!kot.table_takeaway"
-                                        class="text-sm font-medium text-[#6B7280]"
-                                    >{{ $t('table') }}:
-                                    </span>
-                                    <span class="text-black-500 font-semibold">
-                                        {{ kot.tableortakeaway }}
-                                        <span class="text-sm font-medium text-[#6B7280]">
-                                            ( {{ kot.user }} )
-                                        </span
-                                    ></span>
-                                    <br />
-                                    <span v-if="kot.is_aggregator" class="text-sm font-medium text-[#6B7280]">التطبيقات الوسيطة</span>
-                                    <span v-if="kot.is_aggregator" class="text-black-500 mr-2 font-semibold">
-                                        {{ kot.customer_name }}
-                                    </span>
-                                    <br v-if="kot.is_aggregator" />
-                                    <span v-if="kot.is_aggregator" class="text-sm font-medium text-[#6B7280]">مُعرف التطبيق الوسيط</span>
-                                    <span v-if="kot.is_aggregator" class="text-black-500 mr-2 font-semibold">
-                                        {{ kot.aggregator_id }}
-                                    </span>
-                                    <br v-if="kot.is_aggregator"/>
-                                    <span class="text-sm font-medium text-[#6B7280]">{{ $t('order') }}:</span>
-                                    <span class="text-black-500 mr-2 font-semibold text-xs">
-                                        <!-- {{ this.daily_order_number ? kot.order_no : kot.invoice.slice(-4) }} -->
-                                        {{ this.daily_order_number ? kot.order_no : kot.invoice }}
-                                    </span>
-                                    <!-- <span
-                                        class="text-black-500 mr-2 font-semibold"
-                                        v-if="
-                                            kot.type === 'Partially cancelled' ||
-                                            kot.type === 'Cancelled'
-                                        "
-                                    >
-                                        ( {{ kot.type }} )</span
-                                    > -->
+                                        <!-- :class="kot.timecolor" -->
+                                        {{ kot.timeRemaining }}<span class="text-sm">{{ $t('m') }}</span>
+                                        <span class="text-sm text-gray-500">/ {{ kot.preparation_time }}{{ $t('m') }}</span>
+                                    </div>
                                 </div>
                                 <div
-                                    :class="[
-                                        (kot.timeRemaining >= (kot.preparation_time - 1) &&
-                                        kot.type !== 'Cancelled' &&
-                                        kot.type !== 'Partially cancelled') ?
-                                        'text-[#DC0000]' :
-                                        'text-black'
-                                    ]"
-                                    class="font-inter font-semibold text-2xl leading-10"
+                                    v-if="kot.type === 'Duplicate'"
+                                    class="text-[#DC0000] font-medium"
                                 >
-                                    <!-- :class="kot.timecolor" -->
-                                    {{ kot.timeRemaining }}<span class="text-sm">{{ $t('m') }}</span>
-                                    <span class="text-sm text-gray-500">/ {{ kot.preparation_time }}{{ $t('m') }}</span>
+                                    ( Duplicate KOT ( CHECK WITH CAPTAIN ) )
                                 </div>
-                            </div>
-                            <div
-                                v-if="kot.type === 'Duplicate'"
-                                class="text-[#DC0000] font-medium"
-                            >
-                                ( Duplicate KOT ( CHECK WITH CAPTAIN ) )
-                            </div>
-                            <div v-show="kot.comments" class="text-[#6B7280] font-medium border-r-2 border-l-2 pr-1 border-[#6B7280] bg-[#6B7280] bg-opacity-10 rounded">
-                                {{ kot.comments }}
+                                <div v-show="kot.comments" class="text-[#6B7280] font-medium border-r-2 border-l-2 pr-1 border-[#6B7280] bg-[#6B7280] bg-opacity-10 rounded">
+                                    {{ kot.comments }}
+                                </div>
                             </div>
                             <div></div>
-                            <div class="mt-5">
+                            <div class="">
                                 <div
-                                    :class="[GetKOTItemColor(kotitem.kot_type, kot.restaurant_table, kot.table_takeaway), 'rounded p-2']"
-                                    class="font-semibold justify-between items-center mt-2"
+                                    :class="[GetKOTItemColor(kotitem.kot_type, kot.restaurant_table, kot.table_takeaway), 'rounded px-2']"
+                                    class="font-semibold justify-between items-center relative"
                                     v-for="kotitem in sortedKotItems(kot)"
                                     :key="kotitem.name"
                                 >
@@ -175,13 +195,13 @@
                                             ? toggleItemStrikeThrough(kotitem, kot)
                                             : null
                                         "
-                                        :class="{
-                                            'line-through text-green-700': kotitem.striked,
-                                        }"
-                                        class="flex font-semibold justify-between items-center hover:cursor-pointer"
+                                        class="flex font-semibold justify-between items-center hover:cursor-pointer overflow-hidden"
                                     >
-                                    <div>
-                                        <span class="text-black-100">
+                                    <!-- :class="{
+                                        'line-through text-green-700': kotitem.striked,
+                                    }" -->
+                                    <div class="transition-colors duration-300">
+                                        <span class="text-black-100 relative">
                                             - {{
                                                 $i18n.locale === 'ar' ? kotitem.item_name :
                                                     $i18n.locale === 'en' ? kotitem.item :
@@ -190,10 +210,15 @@
                                             <span v-if="kotitem.indicate_course" class="text-sm text-gray-500 mr-1">
                                                 ( {{kotitem.course}} )
                                             </span>
+                                            <div 
+                                                v-if="kotitem.striked"
+                                                class="absolute inset-y-1/2 left-0 h-0.5 bg-green-700 animate-strike"
+                                                style="transform: translateY(-50%)"
+                                            ></div>
                                         </span>
                                         <br />
                                         <span
-                                            class="mr-2 text-gray-700 text-sm"
+                                            class="mr-2 text-gray-700 text-sm relative"
                                             v-if="
                                                 (is_role_responsible_for_serving_kot || is_restaurant_manager) &&
                                                     (kotitem?.kot_type === 'Partially cancelled' ||
@@ -207,18 +232,28 @@
                                             >
                                                 ({{ kotitem.kot_production + " | " + $t(kotitem.kot_type) }})
                                             </span>
+                                            <div 
+                                                v-if="kotitem.striked"
+                                                class="absolute inset-y-1/2 left-0 h-0.5 bg-green-700 animate-strike"
+                                                style="transform: translateY(-50%)"
+                                            ></div>
                                         </span>
                                         <span
-                                            class="mr-2 text-gray-700 text-sm"
+                                            class="mr-2 text-gray-700 text-sm relative"
                                             v-else-if="
                                                 (!is_role_responsible_for_serving_kot && !is_restaurant_manager) &&
                                                     (kot?.type === 'Partially cancelled' ||
                                                     kot?.type === 'Cancelled')"
                                         >
                                             [الكمية السابقة = {{ kotitem.quantity }}]
+                                            <div 
+                                                v-if="kotitem.striked"
+                                                class="absolute inset-y-1/2 left-0 h-0.5 bg-green-700 animate-strike"
+                                                style="transform: translateY(-50%)"
+                                            ></div>
                                         </span>
                                         <span
-                                            class="mr-2 text-gray-500 flex items-center"
+                                            class="mr-2 text-gray-500 flex items-center relative"
                                             v-if="(is_role_responsible_for_serving_kot || is_restaurant_manager) &&
                                                 (kotitem?.kot_type !== 'Partially cancelled' &&
                                                 kotitem?.kot_type !== 'Cancelled')"
@@ -239,20 +274,35 @@
                                                 {{ kotitem?.timeRemaining }}<span class="text-xs">{{ $t('m') }}</span>
                                                 <span class="text-xs text-gray-500">/ {{ kotitem?.preparation_time }}{{ $t('m') }}</span>
                                             </div>
+                                            <div 
+                                                v-if="kotitem.striked"
+                                                class="absolute inset-y-1/2 left-0 h-0.5 bg-green-700 animate-strike"
+                                                style="transform: translateY(-50%)"
+                                            ></div>
                                         </span>
                                     </div>
-                                    <div>
+                                    <div class="relative">
                                         <span class="mr-2 text-black-100">{{ kotitem.qty }}</span>
+                                        <div 
+                                            v-if="kotitem.striked"
+                                            class="absolute inset-y-1/2 left-0 h-0.5 bg-green-700 animate-strike"
+                                            style="transform: translateY(-50%)"
+                                        ></div>
                                     </div>
                                 </div>
                                 <div>
                                     <p
                                         v-show="kotitem.comment"
-                                        class="mr-2 text-[#6B7280] font-medium border-r-2 pr-1 border-[#6B7280] bg-[#6B7280] bg-opacity-10 rounded"
+                                        class="mr-2 text-[#6B7280] font-medium border-r-2 pr-1 border-[#6B7280] bg-[#6B7280] bg-opacity-10 rounded relative"
                                     >
                                         {{ kotitem.comment }}
+                                        <div 
+                                            v-if="kotitem.striked"
+                                            class="absolute inset-y-1/2 left-0 h-0.5 bg-green-700 animate-strike"
+                                            style="transform: translateY(-50%)"
+                                        ></div>
                                     </p>
-                                    <hr class="my-1 border-gray-600 mt-2" />
+                                    <hr class="my-1 border-gray-600 mt-1" />
                                 </div>
                             </div>
                         </div>
@@ -288,12 +338,26 @@
         >
             {{ statusMessage }}
         </div>
+        <div class="fixed bottom-3 right-4 flex gap-2">
+            <button 
+                @click="scrollHorizontally(300)"
+                class="p-2 bg-gray-200 backdrop-blur shadow-xl rounded-full hover:scale-105 transition-all"
+            >
+                →
+            </button>
+            <button 
+                @click="scrollHorizontally(-300)"
+                class="p-2 bg-gray-200 backdrop-blur shadow-xl rounded-full hover:scale-105 transition-all"
+            >
+                ←
+            </button>
+        </div>
     </div>
 </template>
 
 <script>
     import { FrappeApp } from "frappe-js-sdk";
-    import Masonry from "masonry-layout";
+    // import Masonry from "masonry-layout";
     import io from "socket.io-client";
     import { useRestaurantSystemSettings } from "@/stores/RestaurantSystemSettings.js";
 
@@ -345,7 +409,7 @@
         data() {
             return {
                 kot: [],
-                masonry: null,
+                // masonry: null,
                 call: frappe.call(),
                 production: "",
                 branch: "",
@@ -369,6 +433,7 @@
                 production_units_roles_map: null,
                 is_role_responsible_for_serving_kot: false,
                 is_restaurant_manager: false,
+                loading: false,
             };
         },
         setup() {
@@ -377,6 +442,10 @@
             return {settings}
         },
         methods: {
+            scrollHorizontally(offset) {
+                const container = this.$el.querySelector('.overflow-x-auto');
+                container.scrollBy({ left: offset, behavior: 'smooth' });
+            },
             playAlertSound(path) {
                 var currentDomain = window.location.origin;
                 var audio_path = currentDomain + path;
@@ -432,7 +501,7 @@
                                 this.kot = result.message.KOT;
                                 this.updateQtyColorTable();
                                 this.updateTimeRemaining();
-                                this.masonryLoading();
+                                // this.masonryLoading();
                                 resolve();
                             })
                             .catch((error) => {
@@ -445,7 +514,7 @@
                 });
             },
             rotateCard(kot) {
-                this.masonryLoading();
+                // this.masonryLoading();
                 kot.isRotated = !kot.isRotated;
             },
             confirmOrder(kot) {
@@ -462,7 +531,7 @@
                         // this.showDiv = false;
 
                         this.removeAllItemsFromLocalStorage(kot);
-                        this.masonryLoading();
+                        // this.masonryLoading();
                     })
                     .catch((error) => console.error(error));
             },
@@ -492,7 +561,7 @@
                         // this.showDiv = false;
 
                         this.removeAllItemsFromLocalStorage(kot);
-                        this.masonryLoading();
+                        // this.masonryLoading();
                     })
                     .catch((error) => console.error(error));
             },
@@ -750,24 +819,24 @@
             // },
             fetchkotwithmasonry() {
                 return this.fetchKOT().then(() => {
-                    this.masonryLoading();
+                    // this.masonryLoading();
                 });
             },
             redirectToLogin() {
                 var currentDomain = window.location.origin;
                 window.location.href = currentDomain + "/login?redirect-to=URYMosaic/" + this.production;
             },
-            masonryLoading() {
-                this.$nextTick(() => {
-                    this.masonry = new Masonry(this.$el.querySelector(".grid"), {
-                        itemSelector: ".masonry-item",
-                        gutter: 28,
+            // masonryLoading() {
+            //     this.$nextTick(() => {
+            //         this.masonry = new Masonry(this.$el.querySelector(".grid"), {
+            //             itemSelector: ".masonry-item",
+            //             gutter: 28,
 
-                        // Other Masonry options can be added here
-                    });
-                    this.masonry.layout();
-                });
-            },
+            //             // Other Masonry options can be added here
+            //         });
+            //         this.masonry.layout();
+            //     });
+            // },
             hideAudioAlertMessage() {
                 this.showAudioAlertMessage = false;
             },
@@ -776,7 +845,7 @@
                 this.setStatusMessage("You are online");
                 this.hideStatusMessageAfterDelay();
                 this.fetchKOT().then(() => {
-                    this.masonryLoading();
+                    // this.masonryLoading();
                 });
             },
             handleOffline() {
@@ -798,18 +867,25 @@
                 }
             },
         },
+        beforeUnmount() {
+            if(socket) socket.disconnect();
+        },
         mounted() {
             window.addEventListener("online", this.handleOnline);
             window.addEventListener("offline", this.handleOffline);
             document.addEventListener("click", this.hideAudioAlertMessage);
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'ArrowRight') this.scrollHorizontally(320)
+                if(e.key === 'ArrowLeft') this.scrollHorizontally(-320)
+            });
             const currentUrl = window.location.href;
             const parts = currentUrl.split("/");
             const production = parts[parts.length - 1];
             const decodedProduction = decodeURIComponent(production);
             this.production = decodedProduction;
             const self = this;
-            window.addEventListener("resize", this.masonryLoading());
-            this.masonryLoading();
+            // window.addEventListener("resize", this.masonryLoading());
+            // this.masonryLoading();
 
             this.auth()
                 .then(() => {
@@ -824,7 +900,7 @@
                                 }
                                 setTimeout(()=>{
                                     this.fetchKOT().then(() => {
-                                        this.masonryLoading();
+                                        // this.masonryLoading();
                                     });
                                 },1500);
                             } else if (
@@ -841,19 +917,19 @@
                                     if (doc.last_kot_time !== kottime) {
                                         setTimeout(()=>{
                                             this.fetchKOT().then(() => {
-                                                this.masonryLoading();
+                                                // this.masonryLoading();
                                             });
                                         },1500);
                                     }
                                 }
                                 this.kot.unshift(doc.kot);
-                                this.masonryLoading();
+                                // this.masonryLoading();
                                 this.updateQtyColorTable();
                                 this.updateTimeRemaining();
                                 setTimeout(()=>{
                                     if (doc.kot.type === "Cancelled"){
                                         this.fetchKOT().then(() => {
-                                            this.masonryLoading();
+                                            // this.masonryLoading();
                                         });
                                     }
                                 },1500);
@@ -895,5 +971,100 @@
 
     * {
         user-select: none;
+    }
+
+    /* Custom scrollbar styling */
+    .overflow-x-auto {
+        scrollbar-width: thin !important;
+        scrollbar-color: #cbd5e1 transparent;
+        scrollbar-gutter: stable;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar {
+        @apply h-2;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-track {
+        @apply bg-gray-200;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+        @apply bg-gray-400 rounded-full;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* KOT item internal scrolling */
+    .kot-content {
+        overflow-y: auto;
+        max-height: calc(100vh - 140px);
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        scrollbar-gutter: stable;
+        padding-left: 8px;
+    }
+
+    .kot-card {
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        transition: all 0.2s ease;
+    }
+
+    .kot-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px -2px rgb(0 0 0 / 0.1);
+    }
+
+    /* Remove default margin/padding */
+    .container {
+        max-width: none !important;
+        padding-right: 0;
+    }
+
+     @keyframes strike {
+        0% { width: 0; }
+        100% { width: 100%; }
+    }
+
+    .animate-strike {
+        animation: strike 0.3s ease-out 0.1s forwards;
+    }
+
+    @keyframes fade-in {
+        0% { 
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        100% { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.3s ease-out 0.2s;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(220, 0, 0, 0.3),
+                        0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        70% {
+            box-shadow: 0 0 0 8px rgba(220, 0, 0, 0),
+                        0 8px 12px -2px rgba(0, 0, 0, 0.1);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 0, 0, 0),
+                        0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    .pulsing-border {
+        animation: pulse 1.5s infinite;
+        border: 1px solid #DC0000;
+        position: relative;
+        z-index: 1;
     }
 </style>
