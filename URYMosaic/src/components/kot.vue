@@ -45,8 +45,14 @@
         </div> -->
 
         <!-- <div class="mt-5 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"> -->
-        <div class="flex flex-row-reverse flex-nowrap overflow-x-auto space-x-4 py-2 px-3 h-[calc(100vh-120px)]">
-            <div v-for="kot in this.kot" :key="kot.name">
+        <div
+            :class="[
+                settings.row_count === 1 ?
+                'flex flex-row-reverse flex-nowrap overflow-x-auto space-x-4 py-2 px-3 h-[calc(100vh-120px)]' :
+                'grid grid-rows-2 grid-flow-col auto-cols-min gap-2 overflow-x-auto py-2 px-3 h-[calc(100vh-120px)] [direction:ltr]'
+            ]"
+        >
+            <div v-for="kot in this.kot" :key="kot.name" class="[direction:ltr]">
                 <!-- <div
                     :class="[kot.color]"
                     class="inline-block shadow-lg gap-4 p-3 rounded-2xl w-90 h-auto masonry-item"
@@ -56,15 +62,30 @@
                 <div
                     :class="[
                         kot.color,
-                        'flex flex-col flex-shrink-0 w-80 shadow-lg gap-4 p-3 rounded-2xl h-[calc(100vh-140px)] mx-2 kot-card relative',
+                        'flex flex-col flex-shrink-0 w-80 shadow-lg gap-4 p-3 rounded-2xl mx-2 kot-card relative',
+                        !settings.fixed_height ? (
+                            settings.row_count === 1 ? 'h-auto max-h-[calc(100vh-140px)]' : 'h-auto max-h-[calc(((100vh-140px)/2)-5px)]'
+                        ) : (
+                            settings.row_count === 1 ? 'h-[calc(100vh-140px)]' : 'h-[calc(((100vh-140px)/2)-5px)]'
+                        ),
                         {
                             'pulsing-border': (kot.timeRemaining >= (kot.preparation_time - 1) && kot.type !== 'Cancelled' && kot.type !== 'Partially cancelled')
                         },
                     ]"
+                    class="[direction:rtl]"
                     v-if="!kot.showDiv"
                 >
                     <!-- <div class="w-80 check"> -->
-                    <div class="w-full kot-content">
+                    <div
+                        class="w-full kot-content"
+                        :class="[
+                            !settings.fixed_height ? (
+                                settings.row_count === 1 ? 'h-[calc(100%)]' : 'h-[calc(100%)]'
+                            ) : (
+                                settings.row_count === 1 ? 'max-h-[calc(100vh-140px)]' : 'max-h-[calc((100vh-140px)/2)]'
+                            ),
+                        ]"
+                    >
                         <div
                             :class="[{ hidden: !kot.isRotated }]"
                             @click="
@@ -315,7 +336,7 @@
         <!-- Audio Alert Message -->
         <div
             v-if="showAudioAlertMessage"
-            class="absolute top-1 left-1/2 transform -translate-x-1/2 p-2 font-bold text-2xl text-red-500 text-center"
+            class="absolute top-1 z-40 left-1/2 transform -translate-x-1/2 p-2 font-bold text-2xl text-red-500 text-center"
         >
             {{ $t('alertSound') }}
         </div>
@@ -999,7 +1020,7 @@
     /* KOT item internal scrolling */
     .kot-content {
         overflow-y: auto;
-        max-height: calc(100vh - 140px);
+        /* max-height: calc(100vh - 140px); */
         scrollbar-width: thin;
         scrollbar-color: #cbd5e1 transparent;
         scrollbar-gutter: stable;

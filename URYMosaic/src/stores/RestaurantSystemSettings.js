@@ -8,6 +8,8 @@ export const useRestaurantSystemSettings = defineStore("restaurant_system_settin
     state: () => ({
         restaurant_system_settings: {},
         call: frappe.call(),
+        row_count: parseInt(localStorage.getItem('row_count')) || 1,
+        fixed_height: localStorage.getItem('fixed_height') || true,
     }),
     getters: {
         get_restaurant_system_settings() {
@@ -22,6 +24,14 @@ export const useRestaurantSystemSettings = defineStore("restaurant_system_settin
                 .catch((error) => {
                     console.error("Error fetching restaurant system settings:", error);
                 });
+        },
+        toggleRowCount() {
+            this.row_count = this.row_count === 1 ? 2 : 1;
+            localStorage.setItem('row_count', this.row_count);
+        },
+        toggleFixedHeight() {
+            this.fixed_height = !this.fixed_height;
+            localStorage.setItem('fixed_height', this.fixed_height);
         },
     },
 });

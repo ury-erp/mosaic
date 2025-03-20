@@ -13,6 +13,22 @@
       <button
           style="user-select: none;"
           class="ml-2 hover:bg-slate-300 text-blue-700 font-semibold px-6 py-1 rounded-md"
+          @click="toggleFixedHeight()"
+          :title="fixedHeightTitle"
+      >
+        {{ fixedHeightLabel }}
+      </button>
+      <button
+          style="user-select: none;"
+          class="ml-2 hover:bg-slate-300 text-blue-700 font-semibold px-6 py-1 rounded-md"
+          @click="toggleRowCount()"
+          :title="rowCountTitle"
+      >
+        {{ rowCountLabel }}
+      </button>
+      <button
+          style="user-select: none;"
+          class="ml-2 hover:bg-slate-300 text-blue-700 font-semibold px-6 py-1 rounded-md"
           @click="toggleLanguage()"
           :title="
             $i18n.locale == 'ar' ? 'تغيير اللغة إلى English' : '' +
@@ -71,9 +87,26 @@
         this.$i18n.locale = newLang;
         localStorage.setItem('lang', newLang);
       },
+      toggleRowCount() {
+        this.settings.toggleRowCount();
+      },
+      toggleFixedHeight() {
+        this.settings.toggleFixedHeight();
+      },
     },
     computed: {
-      
+      rowCountLabel() {
+        return this.system_settings.row_count === 1 ? '1' : '2';
+      },
+      rowCountTitle() {
+        return this.system_settings.row_count === 1 ? 'تغيير العرض إلى صفين' : 'تغيير العرض إلى صف واحد';
+      },
+      fixedHeightLabel() {
+        return this.system_settings.fixed_height === true ? 'Fixed' : 'Dynamic';
+      },
+      fixedHeightTitle() {
+        return this.system_settings.fixed_height === true ? 'تغيير طول الكروت إلى Dynamic' : 'تغيير طول الكروت إلى Fixed';
+      },
     },
   };
 </script>
