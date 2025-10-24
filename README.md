@@ -1,4 +1,6 @@
-# URY Mosaic - Open Source KOT (Kitchen Order Ticket) Management System
+# ⚠️ This repository is no longer actively maintained. Please find the new location at [URY](https://github.com/ury-erp/ury)
+
+## URY Mosaic - Open Source KOT (Kitchen Order Ticket) Management System
 
 URY Mosaic is an interactive Kitchen Display System (KDS) designed to simplify order management in both single and multi-kitchen restaurants. It integrates with URY POS and URY Serve to display orders with essential details highlighted. Additionally, it offers optional Kitchen Order Ticket (KOT) printing support for added convenience.
 
