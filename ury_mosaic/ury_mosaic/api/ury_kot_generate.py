@@ -62,8 +62,9 @@ def create_kot_doc(
     if restaurant_table:
         room = frappe.db.get_value("URY Table", restaurant_table, "restaurant_room")
         restaurant = frappe.db.get_value("URY Table", restaurant_table, "restaurant")
-        menu = frappe.db.get_value("Menu for Room", {"room": room,"parent":restaurant}, "menu")
-        
+        room_wise_menu = frappe.db.get_value("URY Restaurant", restaurant, "room_wise_menu")
+        menu = None
+        menu = frappe.db.get_value("Menu for Room", {"room": room,"parent":restaurant}, "menu") if room_wise_menu else frappe.db.get_value("URY Restaurant", restaurant, "active_menu")      
     else:
         menu = frappe.db.get_value("URY Restaurant", {"branch": branch}, "active_menu")
 
